@@ -1,0 +1,216 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Authenticated user profile and display preferences for Reemz Pickz",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the owner"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User display name"
+        },
+        "preferredFormat": {
+          "type": "string",
+          "enum": ["AMERICAN", "DECIMAL"],
+          "description": "Preferred odds format"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp set via FieldValue.serverTimestamp()"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp set via FieldValue.serverTimestamp()"
+        }
+      },
+      "required": ["userId", "displayName", "preferredFormat", "createdAt", "updatedAt"]
+    },
+    "SavedParlay": {
+      "title": "SavedParlay",
+      "description": "User-bookmarked correlated parlay with Gaussian Copula hit probability and EV metrics",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner Firebase Auth UID"
+        },
+        "title": {
+          "type": "string",
+          "description": "Joined parlay leg summary"
+        },
+        "leagueCodes": {
+          "type": "string",
+          "description": "League code(s) covered by parlay"
+        },
+        "correlatedProb": {
+          "type": "number",
+          "description": "Gaussian Copula joint hit probability"
+        },
+        "independentProb": {
+          "type": "number",
+          "description": "Naive independent joint probability"
+        },
+        "avgRho": {
+          "type": "number",
+          "description": "Average pairwise correlation coefficient"
+        },
+        "correlatedEvPercent": {
+          "type": "number",
+          "description": "Correlated expected value percentage as decimal"
+        },
+        "marketAmericanOdds": {
+          "type": "integer",
+          "description": "Market American parlay odds"
+        },
+        "primaryThesis": {
+          "type": "string",
+          "description": "Correlation rationale summary"
+        },
+        "legSummaries": {
+          "type": "array",
+          "description": "Up to 5 concise leg descriptions"
+        },
+        "sameGame": {
+          "type": "boolean",
+          "description": "Whether all legs belong to the same event"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp set via FieldValue.serverTimestamp()"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp set via FieldValue.serverTimestamp()"
+        }
+      },
+      "required": [
+        "userId",
+        "title",
+        "leagueCodes",
+        "correlatedProb",
+        "independentProb",
+        "avgRho",
+        "correlatedEvPercent",
+        "marketAmericanOdds",
+        "primaryThesis",
+        "legSummaries",
+        "sameGame",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "SavedProp": {
+      "title": "SavedProp",
+      "description": "User-bookmarked player prop pick with More/Less lines and recommended side",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner Firebase Auth UID"
+        },
+        "playerName": {
+          "type": "string",
+          "description": "Athlete full display name"
+        },
+        "teamAbbr": {
+          "type": "string",
+          "description": "Team abbreviation"
+        },
+        "leagueCode": {
+          "type": "string",
+          "description": "League code (e.g. NBA, NFL)"
+        },
+        "matchup": {
+          "type": "string",
+          "description": "Short matchup label"
+        },
+        "statLabel": {
+          "type": "string",
+          "description": "Stat category label"
+        },
+        "lineValue": {
+          "type": "number",
+          "description": "Prop threshold line"
+        },
+        "projectedValue": {
+          "type": "number",
+          "description": "Model projected player stat"
+        },
+        "recommendedSide": {
+          "type": "string",
+          "enum": ["MORE", "LESS"],
+          "description": "Recommended +EV selection side"
+        },
+        "winProb": {
+          "type": "number",
+          "description": "Fair win probability of recommended side"
+        },
+        "evPercent": {
+          "type": "number",
+          "description": "Expected value of recommended side"
+        },
+        "moreOdds": {
+          "type": "integer",
+          "description": "American odds for More"
+        },
+        "lessOdds": {
+          "type": "integer",
+          "description": "American odds for Less"
+        },
+        "headshotUrl": {
+          "type": "string",
+          "description": "Optional player headshot image URL"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp set via FieldValue.serverTimestamp()"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp set via FieldValue.serverTimestamp()"
+        }
+      },
+      "required": [
+        "userId",
+        "playerName",
+        "teamAbbr",
+        "leagueCode",
+        "matchup",
+        "statLabel",
+        "lineValue",
+        "projectedValue",
+        "recommendedSide",
+        "winProb",
+        "evPercent",
+        "moreOdds",
+        "lessOdds",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "User profile document"
+    },
+    "/users/{userId}/saved_parlays/{parlayId}": {
+      "schema": { "$ref": "#/entities/SavedParlay" },
+      "description": "User-saved correlated parlay watchlist items"
+    },
+    "/users/{userId}/saved_props/{propId}": {
+      "schema": { "$ref": "#/entities/SavedProp" },
+      "description": "User-saved player prop picks"
+    }
+  }
+}

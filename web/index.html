@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+  <title>Reemz Pickz — Quant Parlay &amp; Prop Terminal</title>
+  <meta name="description" content="Quantitative sports market EV scanner, 25K multi-sim correlated 3-pick parlays, player prop research, and live NBA weekly intel." />
+  <meta name="theme-color" content="#0B0F14" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Reemz Pickz" />
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <!-- Top App Header -->
+    <header class="top-bar">
+      <div class="brand-wrap">
+        <img src="./icon-192.png" alt="Reemz Pickz Logo" class="brand-logo" />
+        <div>
+          <div class="brand-title">REEMZ PICKZ</div>
+          <div class="brand-sub" id="feed-status-line">Connecting to live ESPN feeds…</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button id="live-pill-btn" class="live-pill" type="button" title="Toggle 12s auto-refresh">
+          <span class="pulse-dot"></span>
+          <span id="live-pill-label">LIVE 12s</span>
+        </button>
+        <button id="refresh-all-btn" class="icon-btn" type="button" title="Refresh All Markets" aria-label="Refresh All Markets">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="layout-body">
+      <!-- Desktop / iPad Side Navigation Rail -->
+      <aside class="nav-rail" aria-label="Primary Navigation">
+        <button class="nav-btn active" data-tab="parlays" type="button">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <span>Parlays</span>
+        </button>
+        <button class="nav-btn" data-tab="props" type="button">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>Props</span>
+        </button>
+        <button class="nav-btn" data-tab="leagues" type="button">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span>Leagues</span>
+        </button>
+        <button class="nav-btn" data-tab="ev" type="button">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          <span>+EV</span>
+        </button>
+        <button class="nav-btn" data-tab="lab" type="button">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+          <span>Lab</span>
+        </button>
+      </aside>
+
+      <!-- Main Viewport -->
+      <main id="main-content" class="main-content"></main>
+    </div>
+
+    <!-- iPhone / Mobile Bottom Navigation Bar -->
+    <nav class="bottom-nav" aria-label="Mobile Navigation">
+      <button class="nav-btn active" data-tab="parlays" type="button">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span>Parlays</span>
+      </button>
+      <button class="nav-btn" data-tab="props" type="button">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>Props</span>
+      </button>
+      <button class="nav-btn" data-tab="leagues" type="button">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span>Leagues</span>
+      </button>
+      <button class="nav-btn" data-tab="ev" type="button">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        <span>+EV</span>
+      </button>
+      <button class="nav-btn" data-tab="lab" type="button">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+        <span>Lab</span>
+      </button>
+    </nav>
+
+    <!-- Floating Parlay Sandbox Bar -->
+    <div id="sandbox-bar" class="sandbox-bar hidden">
+      <div class="sandbox-bar-info">
+        <strong id="sandbox-count">0 Legs in Sandbox</strong>
+        <span id="sandbox-summary">Tap Inspect to run 25K Multi-Sim</span>
+      </div>
+      <div class="sandbox-bar-actions">
+        <button id="sandbox-clear-btn" class="btn-ghost-sm" type="button">Clear</button>
+        <button id="sandbox-open-btn" class="btn-emerald-sm" type="button">Sim Slip</button>
+      </div>
+    </div>
+
+    <!-- Modal / Bottom Sheet Overlay -->
+    <div id="modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true">
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-header">
+          <div id="modal-title" class="modal-title">Details</div>
+          <button id="modal-close-btn" class="icon-btn" type="button" aria-label="Close">✕</button>
+        </div>
+        <div id="modal-body" class="modal-body"></div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

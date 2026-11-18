@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Reemz Pickz</string>
+    <string name="nav_top_parlays">Parlays</string>
+    <string name="nav_player_props">Props</string>
+    <string name="nav_live_slate">Leagues</string>
+    <string name="nav_ev_scanner">+EV</string>
+    <string name="nav_quant_lab">Lab</string>
+    <string name="analytics_disclaimer">Quantitative probability &amp; correlation research only. No real-money wagering.</string>
+</resources>

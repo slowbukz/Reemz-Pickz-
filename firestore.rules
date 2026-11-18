@@ -1,0 +1,161 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net: Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Global Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Entity Validators
+    function isValidUserProfile(data) {
+      return data.userId is string && data.userId == request.auth.uid && data.userId.size() <= 128 &&
+             data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 80 &&
+             data.preferredFormat in ['AMERICAN', 'DECIMAL'] &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidSavedParlay(data) {
+      return data.userId is string && data.userId == request.auth.uid && data.userId.size() <= 128 &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+             data.leagueCodes is string && data.leagueCodes.size() >= 1 && data.leagueCodes.size() <= 40 &&
+             data.correlatedProb is number && data.correlatedProb >= 0.0 && data.correlatedProb <= 1.0 &&
+             data.independentProb is number && data.independentProb >= 0.0 && data.independentProb <= 1.0 &&
+             data.avgRho is number && data.avgRho >= -1.0 && data.avgRho <= 1.0 &&
+             data.correlatedEvPercent is number && data.correlatedEvPercent >= -1.0 && data.correlatedEvPercent <= 5.0 &&
+             data.marketAmericanOdds is int &&
+             data.primaryThesis is string && data.primaryThesis.size() >= 1 && data.primaryThesis.size() <= 400 &&
+             data.legSummaries is list && data.legSummaries.size() <= 5 &&
+             (data.legSummaries.size() == 0 || data.legSummaries[0] is string) &&
+             data.sameGame is bool &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidSavedProp(data) {
+      return data.userId is string && data.userId == request.auth.uid && data.userId.size() <= 128 &&
+             data.playerName is string && data.playerName.size() >= 1 && data.playerName.size() <= 100 &&
+             data.teamAbbr is string && data.teamAbbr.size() >= 1 && data.teamAbbr.size() <= 16 &&
+             data.leagueCode is string && data.leagueCode.size() >= 1 && data.leagueCode.size() <= 16 &&
+             data.matchup is string && data.matchup.size() >= 1 && data.matchup.size() <= 60 &&
+             data.statLabel is string && data.statLabel.size() >= 1 && data.statLabel.size() <= 50 &&
+             data.lineValue is number && data.lineValue >= 0.0 &&
+             data.projectedValue is number && data.projectedValue >= 0.0 &&
+             data.recommendedSide in ['MORE', 'LESS'] &&
+             data.winProb is number && data.winProb >= 0.0 && data.winProb <= 1.0 &&
+             data.evPercent is number && data.evPercent >= -1.0 && data.evPercent <= 5.0 &&
+             data.moreOdds is int &&
+             data.lessOdds is int &&
+             (!('headshotUrl' in data) || (data.headshotUrl is string && data.headshotUrl.size() <= 500)) &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    // Collection 1: /users/{userId}
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow list: if false;
+
+      allow create: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       incoming().keys().hasAll(['userId', 'displayName', 'preferredFormat', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['userId', 'displayName', 'preferredFormat', 'createdAt', 'updatedAt']) &&
+                       isValidUserProfile(incoming());
+
+      allow update: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       isValidUserProfile(incoming()) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'preferredFormat', 'updatedAt']);
+
+      allow delete: if isOwner(userId) && isValidId(userId);
+
+      // Collection 2: /users/{userId}/saved_parlays/{parlayId}
+      match /saved_parlays/{parlayId} {
+        allow get: if isOwner(userId) && isValidId(parlayId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(parlayId) &&
+                         incoming().keys().hasAll([
+                           'userId', 'title', 'leagueCodes', 'correlatedProb', 'independentProb',
+                           'avgRho', 'correlatedEvPercent', 'marketAmericanOdds', 'primaryThesis',
+                           'legSummaries', 'sameGame', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'title', 'leagueCodes', 'correlatedProb', 'independentProb',
+                           'avgRho', 'correlatedEvPercent', 'marketAmericanOdds', 'primaryThesis',
+                           'legSummaries', 'sameGame', 'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidSavedParlay(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(parlayId) &&
+                         isValidSavedParlay(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'title', 'correlatedProb', 'independentProb', 'avgRho',
+                           'correlatedEvPercent', 'marketAmericanOdds', 'primaryThesis', 'updatedAt'
+                         ]);
+
+        allow delete: if isOwner(userId) && isValidId(parlayId);
+      }
+
+      // Collection 3: /users/{userId}/saved_props/{propId}
+      match /saved_props/{propId} {
+        allow get: if isOwner(userId) && isValidId(propId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(propId) &&
+                         incoming().keys().hasAll([
+                           'userId', 'playerName', 'teamAbbr', 'leagueCode', 'matchup', 'statLabel',
+                           'lineValue', 'projectedValue', 'recommendedSide', 'winProb', 'evPercent',
+                           'moreOdds', 'lessOdds', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'playerName', 'teamAbbr', 'leagueCode', 'matchup', 'statLabel',
+                           'lineValue', 'projectedValue', 'recommendedSide', 'winProb', 'evPercent',
+                           'moreOdds', 'lessOdds', 'headshotUrl', 'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidSavedProp(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(propId) &&
+                         isValidSavedProp(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'lineValue', 'projectedValue', 'recommendedSide', 'winProb',
+                           'evPercent', 'moreOdds', 'lessOdds', 'updatedAt'
+                         ]);
+
+        allow delete: if isOwner(userId) && isValidId(propId);
+      }
+    }
+  }
+}

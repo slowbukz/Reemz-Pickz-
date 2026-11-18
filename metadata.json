@@ -1,0 +1,6 @@
+{
+  "name": "Reemz Pickz",
+  "description": "Quantitative sports market EV scanner and correlated parlay probability engine",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

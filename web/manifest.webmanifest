@@ -1,0 +1,24 @@
+{
+  "name": "Reemz Pickz",
+  "short_name": "Reemz Pickz",
+  "description": "Quantitative sports market EV scanner, 25K multi-sim correlated 3-pick parlays, player prop research, and live NBA intel.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0B0F14",
+  "theme_color": "#0B0F14",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
